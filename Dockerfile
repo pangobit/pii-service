@@ -15,7 +15,13 @@ RUN apt-get update \
 COPY requirements.txt .
 RUN pip install --no-cache-dir torch --index-url https://download.pytorch.org/whl/cpu \
     && pip install --no-cache-dir -r requirements.txt --extra-index-url https://download.pytorch.org/whl/cpu \
-    && ! pip list | grep -iE '^(nvidia|cuda-toolkit|triton)'
+    && ! pip list | grep -iE '^(nvidia|cuda-toolkit|triton)' \
+    && find /usr/local/lib/python3.12/site-packages -type d -name __pycache__ -exec rm -rf {} + \
+    && find /usr/local/lib/python3.12/site-packages -type f \( -name '*.pyc' -o -name '*.pyo' \) -delete \
+    && find /usr/local/lib/python3.12/site-packages -type d -name tests -exec rm -rf {} + \
+    && find /usr/local/lib/python3.12/site-packages -type d -name test -exec rm -rf {} + \
+    && find /usr/local/lib/python3.12/site-packages -type d \( -name benchmarks -o -name benchmark \) -exec rm -rf {} + \
+    && rm -rf /usr/local/lib/python3.12/site-packages/torch/test
 
 COPY model/ /app/model/
 COPY app ./app
