@@ -124,4 +124,6 @@ The model is baked into the Docker image at build time, so production containers
 
 ## License and model
 
-Application code in this repository is yours to use under your project license. The underlying model is subject to the license on [knowledgator/gliner-pii-base-v1.0](https://huggingface.co/knowledgator/gliner-pii-base-v1.0).
+Application code in this repository is licensed under the [Apache License 2.0](LICENSE).
+
+The baked-in weights come from [knowledgator/gliner-pii-base-v1.0](https://huggingface.co/knowledgator/gliner-pii-base-v1.0), which is also Apache-2.0 on Hugging Face. Docker images that include the model should preserve upstream license notices when you redistribute them.
