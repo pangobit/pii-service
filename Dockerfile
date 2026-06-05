@@ -4,8 +4,7 @@ ENV PYTHONDONTWRITEBYTECODE=1 \
     PYTHONUNBUFFERED=1 \
     MODEL_DIR=/app/model \
     ONNX_MODEL_FILE=onnx/model_quint8.onnx \
-    DEFAULT_THRESHOLD=0.3 \
-    HF_HOME=/tmp/hf-cache
+    DEFAULT_THRESHOLD=0.3
 
 WORKDIR /app
 
@@ -16,13 +15,7 @@ RUN apt-get update \
 COPY requirements.txt .
 RUN pip install --no-cache-dir -r requirements.txt
 
-RUN hf download knowledgator/gliner-pii-base-v1.0 \
-    --local-dir /app/model \
-    --exclude "pytorch_model.bin" \
-    --exclude "trainer_state.json" \
-    --exclude "onnx/model.onnx" \
-    --exclude "onnx/model_fp16.onnx"
-
+COPY model/ /app/model/
 COPY app ./app
 
 EXPOSE 8000

@@ -11,10 +11,13 @@ You send plain text and a list of entity types to look for (or use the built-in 
 ```bash
 git clone git@github.com:pangobit/pii-service.git
 cd pii-service
+pip install huggingface_hub
+export HF_TOKEN=hf_...   # optional but avoids Hugging Face rate limits
+MODEL_DOWNLOAD_DIR=./model python scripts/download_model.py
 docker compose up --build
 ```
 
-The first build downloads the model into the image; it can take several minutes. When the container is healthy, the API is at [http://localhost:8000](http://localhost:8000).
+The model is copied into the image from `./model` (about 200MB). Download once before building. When the container is healthy, the API is at [http://localhost:8000](http://localhost:8000).
 
 Interactive docs: [http://localhost:8000/docs](http://localhost:8000/docs)
 
@@ -103,6 +106,16 @@ docker run --rm -p 8000:8000 ghcr.io/pangobit/pii-service:1.0.0
 ```
 
 Replace `1.0.0` with the version you need. Tags follow the git tag without the `v` prefix (`v1.0.0` → `1.0.0`).
+
+### CI: Hugging Face token (required for image builds)
+
+GitHub Actions downloads the model during `docker build`. Unauthenticated requests are rate-limited (HTTP 429). Add a repository secret:
+
+1. Create a [Hugging Face access token](https://huggingface.co/settings/tokens) with **read** access.
+2. In GitHub: **Settings → Secrets and variables → Actions → New repository secret**
+3. Name: `HF_TOKEN`, value: your token.
+
+CI downloads the model in a workflow step (with caching), then `docker build` copies `model/` into the image. Local builds use the same download script as in Quick start above.
 
 ## Configuration
 

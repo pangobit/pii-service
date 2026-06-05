@@ -21,6 +21,30 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v4
 
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      - name: Restore model cache
+        id: model-cache
+        uses: actions/cache@v4
+        with:
+          path: model
+          key: gliner-pii-quint8-${{ hashFiles('scripts/download_model.py') }}
+
+      - name: Download model
+        if: steps.model-cache.outputs.cache-hit != 'true'
+        env:
+          HF_TOKEN: ${{ secrets.HF_TOKEN }}
+          MODEL_DOWNLOAD_DIR: ${{ github.workspace }}/model
+        run: |
+          pip install huggingface_hub
+          python scripts/download_model.py
+
+      - name: Verify model files
+        run: test -f model/onnx/model_quint8.onnx
+
       - name: Set up Docker Buildx
         uses: docker/setup-buildx-action@v3
 
