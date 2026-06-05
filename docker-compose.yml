@@ -1,0 +1,20 @@
+services:
+  pii-service:
+    build: .
+    ports:
+      - "8000:8000"
+    environment:
+      MODEL_DIR: /app/model
+      ONNX_MODEL_FILE: onnx/model_quint8.onnx
+      DEFAULT_THRESHOLD: "0.3"
+    restart: unless-stopped
+    deploy:
+      resources:
+        limits:
+          memory: 2G
+    healthcheck:
+      test: ["CMD", "python", "-c", "import urllib.request; urllib.request.urlopen('http://127.0.0.1:8000/health')"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 120s
